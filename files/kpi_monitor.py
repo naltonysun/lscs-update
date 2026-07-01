@@ -1809,7 +1809,21 @@ async function checkUpdate() {
         const d2 = await r2.json();
         if(d2.status === 'ok' && d2.data.status === 'updated') {
           st.textContent = `✅ 更新成功！${d2.data.from_version} → ${d2.data.to_version}`;
-          alert(`✅ 更新成功！版本 ${d2.data.from_version} → ${d2.data.to_version}\n建议刷新页面。`);
+          if(confirm(`✅ 更新成功！版本 ${d2.data.from_version} → ${d2.data.to_version}\n\n需要重启服务使新版本生效，是否立即重启？`)) {
+            st.textContent = '⏳ 重启服务中...';
+            try {
+              const r3 = await fetch('/api/updater/restart', {method:'POST'});
+              const d3 = await r3.json();
+              if(d3.status === 'ok') {
+                st.textContent = '✅ 服务已重启，请刷新页面';
+                alert('✅ 服务已重启！请稍等几秒后刷新页面。');
+              }
+            } catch(e) {
+              st.textContent = '⚠️ 重启指令已发送（' + e.message + '），请手动刷新';
+            }
+          } else {
+            st.textContent = '✅ 更新完成，重启后生效';
+          }
         } else {
           st.textContent = '❌ 更新失败: ' + (d2.data?.error || '未知错误');
         }
@@ -2174,6 +2188,18 @@ class KPIHandler(http.server.BaseHTTPRequestHandler):
                 _up = SoftUpdater(BASE_DIR)
                 _r = _up.rollback()
                 self._json({"status": "ok", "data": _r})
+            except Exception as ex:
+                self._json({"status": "error", "error": str(ex)[:200]})
+        elif path == "/api/updater/restart":
+            """重启服务进程"""
+            try:
+                import subprocess, sys
+                # 启动新进程
+                subprocess.Popen([sys.executable, __file__], shell=False, creationflags=subprocess.DETACHED_PROCESS)
+                # 返回成功后再退出当前进程
+                self._json({"status": "ok", "data": {"message": "重启中...", "pid": os.getpid()}})
+                # 在响应发送后退出
+                threading.Thread(target=lambda: (time.sleep(0.5), os._exit(0)), daemon=True).start()
             except Exception as ex:
                 self._json({"status": "error", "error": str(ex)[:200]})
         else:

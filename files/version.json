@@ -3,7 +3,6 @@
   "release_notes": "版本更新链路测试：动态版本号系统、自动更新模块、多bug修复",
   "min_version": "1.0.2",
   "files": {
-    "version.json": {},
     "kpi_monitor.py": {},
     "updater/updater.py": {},
     "data/local_version.json": {}

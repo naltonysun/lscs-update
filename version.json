@@ -1,7 +1,10 @@
 {
-  "version": "1.0.2",
-  "release_notes": "初始版本",
+  "version": "1.0.3",
+  "release_notes": "版本更新链路测试：动态版本号系统、自动更新模块、多bug修复",
   "min_version": "1.0.0",
-  "files": {},
+  "files": {
+    "kpi_monitor.py": {},
+    "data/local_version.json": {}
+  },
   "post_update": "restart"
 }

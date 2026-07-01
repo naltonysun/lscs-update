@@ -1308,17 +1308,24 @@ table tr:hover { background: #f0f4ff; }
   <div class="card"><h2>📋 版本历史</h2>
     <div style="font-size:13px;line-height:1.8;color:#555;">
     <b>v1.0.3</b> (2026-07-01)<br>
+    &nbsp;&nbsp;🆕 version标签：动态版本号系统，标题栏/设定页自动显示<br>
+    &nbsp;&nbsp;🆕 版本API端点 GET /api/version 供外部读取<br>
+    &nbsp;&nbsp;🔄 系统自动更新测试——从v1.0.2升级至v1.0.3验证全链路<br>
+    &nbsp;&nbsp;🐛 修复：更新器备份路径错误、回滚路径还原逻辑<br>
+    &nbsp;&nbsp;🐛 修复：总流水对比行数据缺失（三模型对比表底部）<br>
+    <br>
+    <b>v1.0.2</b> (2026-07-01)<br>
     &nbsp;&nbsp;🆕 新增「实时对比」页签，含本月流水进度条+各模型实时偏离<br>
     &nbsp;&nbsp;🆕 新增「生成完整报告」功能，四模块自动生成<br>
     &nbsp;&nbsp;🆕 新增自动更新模块(updater)，支持GitHub远程更新源<br>
     &nbsp;&nbsp;🆕 新增v8混合模型(规划中)<br>
-    &nbsp;&nbsp;🆕 version标签：动态版本号系统 + /api/version端点<br>
-    &nbsp;&nbsp;🔄 「系统自动更新测试」—— 从v1.0.2升级至v1.0.3<br>
     &nbsp;&nbsp;🛠️ 事实比对改为实时对比，数据自动从数数拉取<br>
     &nbsp;&nbsp;🛠️ 所有报告数据自动拉取，无需手动输入<br>
+    &nbsp;&nbsp;🛠️ 页面切换仅活动页签刷新，消除全局30秒轮询<br>
     &nbsp;&nbsp;🐛 修复toFixed类型错误、favicon 404、init空元素错误<br>
     &nbsp;&nbsp;🐛 修复v7渠道数据显示为0、Chart.js未加载、死代码残留<br>
     &nbsp;&nbsp;🐛 修复monitor-status返回6月总量而非实时数据<br>
+    &nbsp;&nbsp;🧹 审计清理：删除死代码159行、空文件/重复文件/updater残留<br>
     <br>
     <b>v1.0.1</b> (2026-06-24)<br>
     &nbsp;&nbsp;初始版本：三模型AB测试、月度流水预测、六大页面

@@ -181,11 +181,29 @@ class SoftUpdater:
         except Exception as e:
             return {"status": "error", "error": str(e)[:300]}
 
-    def rollback(self) -> dict:
-        """从备份回滚到上一版本"""
+    def list_backups(self) -> list:
+        """列出所有可回滚的版本"""
+        versions = set()
+        if os.path.exists(self.temp_backup):
+            for root, dirs, files in os.walk(self.temp_backup):
+                for f in files:
+                    if ".bak." in f:
+                        ver = f.split(".bak.")[-1]
+                        versions.add(ver)
+        return sorted(versions, reverse=True)
+
+    def rollback(self, target_version: str = "") -> dict:
+        """从备份回滚到指定版本（不指定则回滚到上一版本）"""
         try:
             local_info = self._get_local_version()
             current_ver = local_info.get("version", "0.0.0")
+            
+            # 如果没有指定版本，用当前版本的previous_version
+            if not target_version:
+                target_version = local_info.get("previous_version", "")
+            
+            if not target_version:
+                return {"status": "error", "error": "未指定回滚目标版本"}
             
             # 递归查找所有备份文件
             if not os.path.exists(self.temp_backup):
@@ -194,20 +212,14 @@ class SoftUpdater:
             all_backups = []
             for root, dirs, files in os.walk(self.temp_backup):
                 for f in files:
-                    if f.endswith(f".bak.{current_ver}"):
+                    if f.endswith(f".bak.{target_version}"):
                         all_backups.append(os.path.join(root, f))
-            if not all_backups:
-                for root, dirs, files in os.walk(self.temp_backup):
-                    for f in files:
-                        if ".bak." in f:
-                            all_backups.append(os.path.join(root, f))
             
             if not all_backups:
-                return {"status": "error", "error": f"没有找到版本 {current_ver} 的备份"}
+                return {"status": "error", "error": f"没有找到版本 {target_version} 的备份"}
             
             restored = []
             for bak_full in all_backups:
-                # 从备份文件路径还原：temp/backup/data/file.json.bak.1.0.2 → data/file.json
                 rel = os.path.relpath(bak_full, self.temp_backup)
                 parts = rel.split(".bak.")
                 if len(parts) != 2:
@@ -218,13 +230,14 @@ class SoftUpdater:
                 shutil.copy2(bak_full, dst)
                 restored.append(orig_rel)
             
-            # 回滚版本号
-            prev_ver = local_info.get("previous_version", "0.0.0")
-            local_info["version"] = prev_ver
+            # 更新版本号
+            prev_prev = local_info.get("previous_version", "0.0.0")
+            local_info["version"] = target_version
             local_info["previous_version"] = current_ver
             local_info["updated_at"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
             self._save_local_version(local_info)
             
+            return {"status": "rolled_back", "from_version": current_ver, "to_version": target_version, "files": restored}
             return {"status": "rolled_back", "from_version": current_ver, "to_version": prev_ver, "files": restored}
         
         except Exception as e:

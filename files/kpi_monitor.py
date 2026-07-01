@@ -2183,6 +2183,14 @@ class KPIHandler(http.server.BaseHTTPRequestHandler):
                 self._json({"status": "ok", "data": _r})
             except Exception as ex:
                 self._json({"status": "error", "error": str(ex)[:200]})
+        elif path == "/api/updater/restart":
+            try:
+                import subprocess
+                subprocess.Popen([sys.executable, __file__], shell=False, creationflags=subprocess.DETACHED_PROCESS)
+                self._json({"status": "ok", "data": {"message": "重启中..."}})
+                threading.Thread(target=lambda: (time.sleep(0.5), os._exit(0)), daemon=True).start()
+            except Exception as ex:
+                self._json({"status": "error", "error": str(ex)[:200]})
         else:
             self._json({"error": "not found"}, 404)
 

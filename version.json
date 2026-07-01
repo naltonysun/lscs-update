@@ -1,0 +1,7 @@
+{
+  "version": "1.0.2",
+  "release_notes": "初始版本",
+  "min_version": "1.0.0",
+  "files": {},
+  "post_update": "restart"
+}

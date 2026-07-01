@@ -1810,7 +1810,21 @@ async function checkUpdate() {
         const d2 = await r2.json();
         if(d2.status === 'ok' && d2.data.status === 'updated') {
           st.textContent = `✅ 更新成功！${d2.data.from_version} → ${d2.data.to_version}`;
-          alert(`✅ 更新成功！版本 ${d2.data.from_version} → ${d2.data.to_version}\n建议刷新页面。`);
+          if(confirm(`✅ 更新成功！版本 ${d2.data.from_version} → ${d2.data.to_version}\n\n需要重启服务使新版本生效，是否立即重启？`)) {
+            st.textContent = '⏳ 重启服务中...';
+            try {
+              const r3 = await fetch('/api/updater/restart', {method:'POST'});
+              const d3 = await r3.json();
+              if(d3.status === 'ok') {
+                st.textContent = '✅ 服务已重启，请刷新页面';
+                alert('✅ 服务已重启！请稍等几秒后刷新页面。');
+              }
+            } catch(e) {
+              st.textContent = '⚠️ 重启指令已发送，请手动刷新';
+            }
+          } else {
+            st.textContent = '✅ 更新完成，重启后生效';
+          }
         } else {
           st.textContent = '❌ 更新失败: ' + (d2.data?.error || '未知错误');
         }

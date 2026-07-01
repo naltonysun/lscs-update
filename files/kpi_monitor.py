@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-月度流水预估系统 v1.0.3 - 全链路数据应用端
+月度流水预估系统 v1.0.2 - 全链路数据应用端
 基于数数TD数据源 + 多模型AB测试 + 用户生命周期精算
 报告直接输出在Web界面
 """
@@ -1095,7 +1095,7 @@ CONFIG_HTML = r'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>全链路数据应用端【月度流水预估系统】v1.0.3</title>
+<title>全链路数据应用端【月度流水预估系统】v1.0.2</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1290,7 +1290,7 @@ table tr:hover { background: #f0f4ff; }
 <div class="page" id="page-wiki">
   <div class="card"><h2>📖 系统概述</h2>
     <p style="line-height:1.8;font-size:13px;color:#555;">
-    <b>系统名称</b>：全链路数据应用端【月度流水预估系统】lscs v1.0.3<br>
+    <b>系统名称</b>：全链路数据应用端【月度流水预估系统】lscs v1.0.2<br>
     <b>核心功能</b>：基于数数TD数据源的多模型AB测试月度流水预测。<br>
     <b>三套方案</b>：🔵v6集成模型 / 🟠v7组件化模型 / 🟢v8多维度加权<br>
     <b>数据源</b>：数数 ThinkingData（全民学霸 项目ID:4）<br>
@@ -1307,13 +1307,6 @@ table tr:hover { background: #f0f4ff; }
   </div>
   <div class="card"><h2>📋 版本历史</h2>
     <div style="font-size:13px;line-height:1.8;color:#555;">
-    <b>v1.0.3</b> (2026-07-01)<br>
-    &nbsp;&nbsp;🆕 version标签：动态版本号系统，标题栏/设定页自动显示<br>
-    &nbsp;&nbsp;🆕 版本API端点 GET /api/version 供外部读取<br>
-    &nbsp;&nbsp;🔄 系统自动更新测试——从v1.0.2升级至v1.0.3验证全链路<br>
-    &nbsp;&nbsp;🐛 修复：更新器备份路径错误、回滚路径还原逻辑<br>
-    &nbsp;&nbsp;🐛 修复：总流水对比行数据缺失（三模型对比表底部）<br>
-    <br>
     <b>v1.0.2</b> (2026-07-01)<br>
     &nbsp;&nbsp;🆕 新增「实时对比」页签，含本月流水进度条+各模型实时偏离<br>
     &nbsp;&nbsp;🆕 新增「生成完整报告」功能，四模块自动生成<br>
@@ -1809,21 +1802,7 @@ async function checkUpdate() {
         const d2 = await r2.json();
         if(d2.status === 'ok' && d2.data.status === 'updated') {
           st.textContent = `✅ 更新成功！${d2.data.from_version} → ${d2.data.to_version}`;
-          if(confirm(`✅ 更新成功！版本 ${d2.data.from_version} → ${d2.data.to_version}\n\n需要重启服务使新版本生效，是否立即重启？`)) {
-            st.textContent = '⏳ 重启服务中...';
-            try {
-              const r3 = await fetch('/api/updater/restart', {method:'POST'});
-              const d3 = await r3.json();
-              if(d3.status === 'ok') {
-                st.textContent = '✅ 服务已重启，请刷新页面';
-                alert('✅ 服务已重启！请稍等几秒后刷新页面。');
-              }
-            } catch(e) {
-              st.textContent = '⚠️ 重启指令已发送（' + e.message + '），请手动刷新';
-            }
-          } else {
-            st.textContent = '✅ 更新完成，重启后生效';
-          }
+          alert(`✅ 更新成功！版本 ${d2.data.from_version} → ${d2.data.to_version}\n建议刷新页面。`);
         } else {
           st.textContent = '❌ 更新失败: ' + (d2.data?.error || '未知错误');
         }
@@ -1849,7 +1828,21 @@ async function runRollback() {
     const d = await r.json();
     if(d.status === 'ok' && d.data.status === 'rolled_back') {
       st.textContent = `✅ 已回滚: ${d.data.from_version} → ${d.data.to_version}`;
-      alert(`✅ 回滚成功！`);
+      if(confirm(`✅ 回滚成功！版本 ${d.data.from_version} → ${d.data.to_version}\n\n需要重启服务使旧版本生效，是否立即重启？`)) {
+        st.textContent = '⏳ 重启服务中...';
+        try {
+          const r2 = await fetch('/api/updater/restart', {method:'POST'});
+          const d2 = await r2.json();
+          if(d2.status === 'ok') {
+            st.textContent = '✅ 服务已重启，请刷新页面';
+            alert('✅ 服务已重启！请稍等几秒后刷新页面。');
+          }
+        } catch(e) {
+          st.textContent = '⚠️ 重启指令已发送，请手动刷新';
+        }
+      } else {
+        st.textContent = '✅ 回滚完成，重启后生效';
+      }
     } else {
       st.textContent = '❌ 回滚失败: ' + (d.data?.error || '未知');
     }
@@ -2190,18 +2183,6 @@ class KPIHandler(http.server.BaseHTTPRequestHandler):
                 self._json({"status": "ok", "data": _r})
             except Exception as ex:
                 self._json({"status": "error", "error": str(ex)[:200]})
-        elif path == "/api/updater/restart":
-            """重启服务进程"""
-            try:
-                import subprocess, sys
-                # 启动新进程
-                subprocess.Popen([sys.executable, __file__], shell=False, creationflags=subprocess.DETACHED_PROCESS)
-                # 返回成功后再退出当前进程
-                self._json({"status": "ok", "data": {"message": "重启中...", "pid": os.getpid()}})
-                # 在响应发送后退出
-                threading.Thread(target=lambda: (time.sleep(0.5), os._exit(0)), daemon=True).start()
-            except Exception as ex:
-                self._json({"status": "error", "error": str(ex)[:200]})
         else:
             self._json({"error": "not found"}, 404)
 
@@ -2220,7 +2201,7 @@ def start_server():
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("  全链路数据应用端 v1.0.3")
+    print("  全链路数据应用端 v1.0.2")
     print("  月度流水预估系统 · 多模型AB测试")
     print("=" * 50)
     print(f"  数据目录: {DATA_DIR}")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-月度流水预估系统 v1.0.2 - 全链路数据应用端
+月度流水预估系统 v1.0.3 - 全链路数据应用端
 基于数数TD数据源 + 多模型AB测试 + 用户生命周期精算
 报告直接输出在Web界面
 """
@@ -1095,7 +1095,7 @@ CONFIG_HTML = r'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>全链路数据应用端【月度流水预估系统】v1.0.2</title>
+<title>全链路数据应用端【月度流水预估系统】v1.0.3</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1290,7 +1290,7 @@ table tr:hover { background: #f0f4ff; }
 <div class="page" id="page-wiki">
   <div class="card"><h2>📖 系统概述</h2>
     <p style="line-height:1.8;font-size:13px;color:#555;">
-    <b>系统名称</b>：全链路数据应用端【月度流水预估系统】lscs v1.0.2<br>
+    <b>系统名称</b>：全链路数据应用端【月度流水预估系统】lscs v1.0.3<br>
     <b>核心功能</b>：基于数数TD数据源的多模型AB测试月度流水预测。<br>
     <b>三套方案</b>：🔵v6集成模型 / 🟠v7组件化模型 / 🟢v8多维度加权<br>
     <b>数据源</b>：数数 ThinkingData（全民学霸 项目ID:4）<br>
@@ -1307,7 +1307,16 @@ table tr:hover { background: #f0f4ff; }
   </div>
   <div class="card"><h2>📋 版本历史</h2>
     <div style="font-size:13px;line-height:1.8;color:#555;">
-    <b>v1.0.2</b> (2026-07-01)<br>
+    <b>v1.0.3</b> (2026-07-01)<br>
+    &nbsp;&nbsp;🆕 version标签：动态版本号系统，标题栏/设定页自动显示<br>
+    &nbsp;&nbsp;🆕 版本API端点 GET /api/version 供外部读取<br>
+    &nbsp;&nbsp;🆕 更新后/回滚后自动重启服务，无需手动操作<br>
+    &nbsp;&nbsp;🆕 多版本回滚：可选择回滚到任意历史版本<br>
+    &nbsp;&nbsp;🔄 系统自动更新链路测试——从v1.0.2升级至v1.0.3<br>
+    &nbsp;&nbsp;🐛 修复：更新器备份路径错误、回滚路径还原逻辑<br>
+    &nbsp;&nbsp;🐛 修复：总流水对比行数据缺失（三模型对比表底部）<br>
+    <br>
+        <b>v1.0.2</b> (2026-07-01)<br>
     &nbsp;&nbsp;🆕 新增「实时对比」页签，含本月流水进度条+各模型实时偏离<br>
     &nbsp;&nbsp;🆕 新增「生成完整报告」功能，四模块自动生成<br>
     &nbsp;&nbsp;🆕 新增自动更新模块(updater)，支持GitHub远程更新源<br>
@@ -2249,7 +2258,7 @@ def start_server():
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("  全链路数据应用端 v1.0.2")
+    print("  全链路数据应用端 v1.0.3")
     print("  月度流水预估系统 · 多模型AB测试")
     print("=" * 50)
     print(f"  数据目录: {DATA_DIR}")
